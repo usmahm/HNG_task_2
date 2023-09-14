@@ -115,7 +115,7 @@ func CreatePerson(c *gin.Context) {
 	}
 
 	fmt.Println(new_person, result)
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(http.StatusCreated, gin.H{
 		"success": true,
 		"data":    new_person,
 		"message": "Person created successfully",

@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -13,7 +12,6 @@ import (
 
 func DBInstance() *mongo.Client {
 	uri := os.Getenv("MONGODB_URI")
-	fmt.Println("uri", uri)
 	if uri == "" {
 		log.Fatal("MONGODB_URI not found in the environment, please add.")
 	}
