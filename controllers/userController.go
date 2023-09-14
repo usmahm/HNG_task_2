@@ -7,6 +7,7 @@ import (
 	"person-app/database"
 	"person-app/helpers"
 	"person-app/models"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -47,12 +48,14 @@ func GetPerson(c *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 		msg := fmt.Sprintf("an error occured")
+		error_code := http.StatusInternalServerError
 
 		if err == mongo.ErrNoDocuments {
 			msg = fmt.Sprintf("person not found")
+			error_code = http.StatusNotFound
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(error_code, gin.H{
 			"success": false,
 			"error":   msg,
 		})
@@ -73,10 +76,16 @@ func CreatePerson(c *gin.Context) {
 	var new_person models.Person
 
 	if err := c.BindJSON(&new_person); err != nil {
+		msg := err.Error()
+		if strings.Contains(err.Error(), "cannot unmarshal number into Go struct field Person.name") {
+			msg = "Name must be a string"
+		}
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error":   err.Error(),
+			"error":   msg,
 		})
+		return
 	}
 
 	if validation_error := validate.Struct(new_person); validation_error != nil {
@@ -121,10 +130,17 @@ func UpdatePerson(c *gin.Context) {
 	var person models.Person
 
 	if err := c.BindJSON(&person); err != nil {
+		msg := err.Error()
+		fmt.Println(msg)
+		if strings.Contains(err.Error(), "invalid character '2' after object key:value pair") {
+			msg = "Name must be a string"
+		}
+
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"error":   err.Error(),
+			"error":   msg,
 		})
+		return
 	}
 
 	update := bson.D{{Key: "$set", Value: bson.D{{Key: "name", Value: person.Name}}}}
@@ -134,12 +150,14 @@ func UpdatePerson(c *gin.Context) {
 	err := database.OpenCollection("person").FindOneAndUpdate(ctx, filter, update, updateOptions).Decode(&person)
 	if err != nil {
 		msg := fmt.Sprintf("an error occured")
+		error_code := http.StatusInternalServerError
 
 		if err == mongo.ErrNoDocuments {
 			msg = fmt.Sprintf("person not found")
+			error_code = http.StatusNotFound
 		}
 
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(error_code, gin.H{
 			"success": false,
 			"error":   msg,
 		})
@@ -162,15 +180,17 @@ func DeletePerson(c *gin.Context) {
 	filter := getFilter(param)
 	result, err := database.OpenCollection("person").DeleteOne(ctx, filter)
 	if err != nil {
-		msg := fmt.Sprintf("an error occured")
-
-		if err == mongo.ErrNoDocuments {
-			msg = fmt.Sprintf("person not found")
-		}
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
-			"error":   msg,
+			"error":   "an error occured",
+		})
+		return
+	}
+
+	if result.DeletedCount == 0 {
+		c.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"error":   "person not found",
 		})
 		return
 	}
