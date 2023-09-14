@@ -26,11 +26,11 @@ To set up the API, follow these steps:
 1. Clone the repository to your local machine:
 
    ```bash
-   git clone https://github.com/yourusername/person-api.git
+   git clone https://github.com/usmahm/HNG_task_2
    ```
 2. Change to the project directory:
    ```bash
-   cd person-api
+   cd HNG_task_2
    ```
 3. Install the required Go packages using:
    ```bash
@@ -67,7 +67,7 @@ The API provides the following endpoints:
 * `PUT /person/:param`: Update an existing person record by ID or name.
 * `DELETE /person/:param`: Delete a person record by ID or name.
 
-For detailed information on each endpoint, refer to the [API Documentation](link).
+For detailed information on each endpoint, refer to the [API Documentation](https://github.com/usmahm/HNG_task_2/blob/master/DOCUMENTATION.md).
 
 ## Error Handling
 The API returns appropriate HTTP status codes and error messages for different scenarios. Refer to the Error Handling section in the API Documentation for more details.
