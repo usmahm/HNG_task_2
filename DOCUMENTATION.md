@@ -182,3 +182,8 @@ This documentation provides an overview of the API for managing person records u
     }
     ```
 
+### Known Limitations
+This API doesn't have authentication or authorization
+
+### Setup and Deployment
+refer to the setup instructions in the [README.md](https://github.com/usmahm/HNG_task_2/edit/master/README.md) file in this repo
